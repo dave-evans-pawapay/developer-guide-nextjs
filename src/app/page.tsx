@@ -1,5 +1,5 @@
 import getActiveConfig from "@/lib/getActiveConfig";
-
+import Head from 'next/head'
 import Deposit from "@/components/deposit";
 
 export default async function Home() {
@@ -7,10 +7,15 @@ export default async function Home() {
 
 
   return (
-    <main>
-        <div className="flex flex-col content-center flex-wrap">
-            <Deposit data = {activeConfig}></Deposit>
-        </div>
-    </main>
+      <>
+        <head>
+            <title>pawaPay nextjs sandbox - Deposit</title>
+        </head>
+        <main>
+            <div className="flex flex-col content-center flex-wrap">
+                <Deposit data = {activeConfig}></Deposit>
+            </div>
+        </main>
+      </>
   )
 }
