@@ -1,5 +1,8 @@
+import {Metadata} from "next";
 
-import Head from 'next/head'
+export const metadata: Metadata = {
+    title: 'pawaPay nextjs sandbox - Bulk'
+};
 
 export default async function Home() {
 
@@ -7,9 +10,6 @@ export default async function Home() {
 
   return (
       <>
-          <head>
-              <title>pawaPay nextjs sandbox - Bulk</title>
-          </head>
           <main>
               <div className="flex flex-col content-center flex-wrap">
                     Bulk Payouts - to be done
