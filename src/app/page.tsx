@@ -12,9 +12,6 @@ export default async function Home() {
 
   return (
       <>
-        <head>
-            <title>pawaPay nextjs sandbox - Deposit</title>
-        </head>
         <main>
             <div className="flex flex-col content-center flex-wrap">
                 <Deposit data = {activeConfig}></Deposit>
