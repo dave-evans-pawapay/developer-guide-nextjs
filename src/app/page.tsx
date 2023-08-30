@@ -1,6 +1,10 @@
 import getActiveConfig from "@/lib/getActiveConfig";
-import Head from 'next/head'
 import Deposit from "@/components/deposit";
+import {Metadata} from "next";
+
+export const metadata: Metadata = {
+    title: 'pawaPay nextjs sandbox - Deposit'
+};
 
 export default async function Home() {
     const activeConfig =  await getActiveConfig();
