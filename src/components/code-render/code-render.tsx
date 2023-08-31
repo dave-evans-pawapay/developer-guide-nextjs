@@ -1,33 +1,33 @@
 import {JSXElementConstructor, PromiseLikeOfReactNode, ReactElement, ReactNode, ReactPortal, useState} from "react";
 
 export default function CodeRender(props: { message: string, transactionType: string }){
-    const prelim = `const fetch = require('node-fetch');
-    const resp =await fetch('https://api.sandbox.pawapay.com/deposits',
-             {
-             method: 'POST',
-             headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer <YOUR_API_KEY>',
-                    },
-             body: 
-     ${props.message}
-             );
-     const data= await resp.json();
-     console.log(data);`
+    let prelim = `const fetch = require('node-fetch');
+const bodyData = ${props.message};
+const resp =await fetch('https://api.sandbox.pawapay.com/deposits',
+    {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer <YOUR_API_KEY>',
+            },
+        body: bodyData
+       });
+const data= await resp.json();
+console.log(data);`
     if (props.transactionType === 'PAYOUT') {
-        const prelim = `const fetch = require('node-fetch');
-    const resp =await fetch('https://api.sandbox.pawapay.com/payouts',
-             {
-             method: 'POST',
-             headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer <YOUR_API_KEY>',
-                    },
-             body: 
-     ${props.message}
-             );
-     const data= await resp.json();
-     console.log(data);`
+        prelim = `const fetch = require('node-fetch');
+const bodyData = ${props.message};
+const resp =await fetch('https://api.sandbox.pawapay.com/payouts',
+    {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer <YOUR_API_KEY>',
+            },
+        body: bodyData
+       });
+const data= await resp.json();
+console.log(data);`
     }
 
     return (
