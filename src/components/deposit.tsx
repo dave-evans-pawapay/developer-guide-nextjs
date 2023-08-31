@@ -17,13 +17,13 @@ export default function Deposit(data: any){
 
     let initialCorrespondent = activeConfig.countries[0].correspondents[0];
     if (searchParams && searchParams.get('mno')){
-        const c = activeConfig.countries[0].correspondents.find(c => c.correspondent == searchParams.get('mno'));
+        const c = initialCountry.correspondents.find(c => c.correspondent == searchParams.get('mno'));
         if (c) {
             initialCorrespondent = c;
         }
     }
     const [country, setCountry] = useState<Country>(initialCountry);
-    const [correspondent, setCorrespondent] = useState<Correspondent>(initialCorrespondent);
+    const [correspondent, setCorrespondent] = useState<string>(initialCorrespondent.correspondent);
     const correspondents = country.correspondents;
     const msisdn = searchParams?.get("msisdn") ? searchParams.get("msisdn") : "";
     const [message, setMessage] = useState({
@@ -34,12 +34,12 @@ export default function Deposit(data: any){
         depositId: "",
         msisdn: msisdn,
         amount: "",
-        currency: activeConfig.countries[0].correspondents[0].currency,
-        country: activeConfig.countries[0].country,
-        correspondent: activeConfig.countries[0].correspondents[0].correspondent,
+        currency: initialCorrespondent.currency,
+        country: initialCountry.country,
+        correspondent: initialCorrespondent.correspondent,
         description: "",
-        minAmount: activeConfig.countries[0].correspondents[0].operationTypes[0].minTransactionLimit,
-        maxAmount: activeConfig.countries[0].correspondents[0].operationTypes[0].maxTransactionLimit
+        minAmount: initialCorrespondent.operationTypes.find(o => o.operationType === 'DEPOSIT')?.minTransactionLimit,
+        maxAmount: initialCorrespondent.operationTypes.find(o => o.operationType === 'DEPOSIT')?.maxTransactionLimit
     });
 
     const handleCountryEvent = (e: any) => {
@@ -49,9 +49,8 @@ export default function Deposit(data: any){
             deposit.country = c.country;
             deposit.correspondent = c.correspondents[0].correspondent;
             deposit.currency = c.correspondents[0].currency;
-            deposit.minAmount = c.correspondents[0].operationTypes[0].minTransactionLimit;
-            deposit.maxAmount = c.correspondents[0].operationTypes[0].maxTransactionLimit;
-
+            deposit.minAmount = c.correspondents[0].operationTypes.find(o => o.operationType === 'DEPOSIT')?.minTransactionLimit;
+            deposit.maxAmount = c.correspondents[0].operationTypes.find(o => o.operationType === 'DEPOSIT')?.maxTransactionLimit;
         }
         console.log(e.target.value);
     }
@@ -108,7 +107,7 @@ export default function Deposit(data: any){
             { message.show ? <Status message={message.message} msgStatus={message.status}/> : null }
                 <form className="w-3/5  mt-5 mb-5"
                 onSubmit={onSubmit}>
-                    <input type="hidden" id="currency" name="currency" value={correspondent.currency} />
+                    <input type="hidden" id="currency" name="currency" value={deposit.currency} />
                     <div className="md:flex md:items-center mb-6">
                         <div className="md:w-1/3">
                             <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" >

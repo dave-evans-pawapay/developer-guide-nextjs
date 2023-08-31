@@ -43,7 +43,7 @@ export  default function TestMsisdns(props: {}) {
                     <select name="country" id="country"
                             onChange={e => handleCountryEvent(e)}>
                         {uniqueCountries.map(country => (
-                            <option value={country}>{country}</option>
+                            <option key={country} value={country}>{country}</option>
                         ))}
                     </select>
                 </div>
@@ -51,7 +51,7 @@ export  default function TestMsisdns(props: {}) {
                     <select name="mno" id="mno"
                             onChange={e => handleMnoEvent(e)}>
                         {uniqueMnos.map(mno => (
-                            <option value={mno}>{mno}</option>
+                            <option key={mno} value={mno}>{mno}</option>
                         ))}
                     </select>
                 </div>
@@ -74,7 +74,7 @@ export  default function TestMsisdns(props: {}) {
                     <tbody>
                         <>
                                 { activeMsisdns.map(msisdn => (
-                                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                    <tr key={`${msisdn.paymentType}-${msisdn.msisdn}`} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             <div className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
                                                 <Link

@@ -17,13 +17,13 @@ export default function Payout(data: any){
 
     let initialCorrespondent = activeConfig.countries[0].correspondents[0];
     if (searchParams && searchParams.get('mno')){
-        const c = activeConfig.countries[0].correspondents.find(c => c.correspondent == searchParams.get('mno'));
+        const c = initialCountry.correspondents.find(c => c.correspondent == searchParams.get('mno'));
         if (c) {
             initialCorrespondent = c;
         }
     }
     const [country, setCountry] = useState<Country>(initialCountry);
-    const [correspondent, setCorrespondent] = useState<Correspondent>(initialCorrespondent);
+    const [correspondent, setCorrespondent] = useState<string>(initialCorrespondent.correspondent);
     const correspondents = country.correspondents;
     const msisdn = searchParams?.get("msisdn") ? searchParams.get("msisdn") : "";
     const [message, setMessage] = useState({
@@ -34,12 +34,12 @@ export default function Payout(data: any){
         payoutId: "",
         msisdn: msisdn,
         amount: "",
-        currency: activeConfig.countries[0].correspondents[0].currency,
-        country: activeConfig.countries[0].country,
-        correspondent: activeConfig.countries[0].correspondents[0].correspondent,
+        currency: initialCorrespondent.currency,
+        country: initialCountry.country,
+        correspondent: initialCorrespondent.correspondent,
         description: "",
-        minAmount: activeConfig.countries[0].correspondents[0].operationTypes[0].minTransactionLimit,
-        maxAmount: activeConfig.countries[0].correspondents[0].operationTypes[0].maxTransactionLimit
+        minAmount: initialCorrespondent.operationTypes.find(o => o.operationType === 'PAYOUT')?.maxTransactionLimit,
+        maxAmount: initialCorrespondent.operationTypes.find(o => o.operationType === 'PAYOUT')?.maxTransactionLimit
     });
 
     const handleCountryEvent = (e: any) => {
@@ -49,8 +49,8 @@ export default function Payout(data: any){
             payout.country = c.country;
             payout.correspondent = c.correspondents[0].correspondent;
             payout.currency = c.correspondents[0].currency;
-            payout.minAmount = c.correspondents[0].operationTypes[0].minTransactionLimit;
-            payout.maxAmount = c.correspondents[0].operationTypes[0].maxTransactionLimit;
+            payout.minAmount = c.correspondents[0].operationTypes.find(o => o.operationType === 'PAYOUT')?.maxTransactionLimit;
+            payout.maxAmount = c.correspondents[0].operationTypes.find(o => o.operationType === 'PAYOUT')?.maxTransactionLimit;
 
         }
         console.log(e.target.value);
@@ -108,7 +108,7 @@ export default function Payout(data: any){
             { message.show ? <Status message={message.message} msgStatus={message.status}/> : null }
                 <form className="w-3/5  mt-5 mb-5"
                 onSubmit={onSubmit}>
-                    <input type="hidden" id="currency" name="currency" value={correspondent.currency} />
+                    <input type="hidden" id="currency" name="currency" value={payout.currency} />
                     <div className="md:flex md:items-center mb-6">
                         <div className="md:w-1/3">
                             <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" >
