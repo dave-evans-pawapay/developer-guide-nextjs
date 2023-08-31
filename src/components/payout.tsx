@@ -2,20 +2,37 @@
 
 import {useState} from "react";
 import Status from "@/components/status";
+import {useSearchParams} from "next/navigation";
 
 export default function Payout(data: any){
-
+    const searchParams = useSearchParams();
     const activeConfig: ActiveConfig = data.data;
-    const [country, setCountry] = useState<Country>(activeConfig.countries[0]);
-    const [correspondent, setCorrespondent] = useState<Correspondent>(activeConfig.countries[0].correspondents[0]);
+    let initialCountry = activeConfig.countries[0];
+    if (searchParams && searchParams.get('country')){
+        const c = activeConfig.countries.find(c => c.country == searchParams.get('country'));
+        if (c) {
+            initialCountry = c;
+        }
+    }
+
+    let initialCorrespondent = activeConfig.countries[0].correspondents[0];
+    if (searchParams && searchParams.get('mno')){
+        const c = activeConfig.countries[0].correspondents.find(c => c.correspondent == searchParams.get('mno'));
+        if (c) {
+            initialCorrespondent = c;
+        }
+    }
+    const [country, setCountry] = useState<Country>(initialCountry);
+    const [correspondent, setCorrespondent] = useState<Correspondent>(initialCorrespondent);
     const correspondents = country.correspondents;
+    const msisdn = searchParams?.get("msisdn") ? searchParams.get("msisdn") : "";
     const [message, setMessage] = useState({
         message:'',
         status: 'Green',
         show: false});
     const [payout, setPayout] = useState({
         payoutId: "",
-        msisdn: "",
+        msisdn: msisdn,
         amount: "",
         currency: activeConfig.countries[0].correspondents[0].currency,
         country: activeConfig.countries[0].country,
@@ -101,6 +118,7 @@ export default function Payout(data: any){
                         <div className="md:w-2/3">
                         <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-400 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                                id="msisdn" name="msisdn" type="text" placeholder="MSISDN"
+                               defaultValue={msisdn ? msisdn : ''}
                                onChange={(e) => {
                                    setPayout({ ...payout, msisdn: e.target.value });
                                }}/>

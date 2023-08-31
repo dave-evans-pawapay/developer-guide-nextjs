@@ -1,6 +1,7 @@
 'use client'
 import GetMockMsisdn from "@/lib/getMockMsisdn";
 import {useState} from "react";
+import Link from "next/link";
 
 export  default function TestMsisdns(props: {}) {
     let msisdns =  GetMockMsisdn();
@@ -75,7 +76,12 @@ export  default function TestMsisdns(props: {}) {
                                 { activeMsisdns.map(msisdn => (
                                     <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            { msisdn.paymentType}
+                                            <div className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
+                                                <Link
+                                                    href={`/${msisdn.paymentType.toLowerCase() === 'deposit' ? '/' : 'payout'}?country=${msisdn.code}&mno=${msisdn.mno}&msisdn=${msisdn.msisdn}`}>
+                                                    { msisdn.paymentType}
+                                                </Link>
+                                            </div>
                                         </th>
                                         <td className="px-6 py-4">
                                             {msisdn.msisdn}
