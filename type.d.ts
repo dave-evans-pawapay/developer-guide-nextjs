@@ -64,3 +64,11 @@ type Message = {
     status: string
     show: boolean
 }
+
+type TestMsisdn = {
+    country: string,
+    paymentType: string,
+    mno: string,
+    msisdn: string
+    failureReason: string
+}
