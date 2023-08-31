@@ -3,6 +3,8 @@
 import {useState} from "react";
 import Status from "@/components/status";
 import {useSearchParams} from "next/navigation";
+import CodeRender from "@/components/code-render/code-render";
+import uuid4 from "uuid4";
 
 export default function Deposit(data: any){
     const searchParams = useSearchParams();
@@ -54,6 +56,23 @@ export default function Deposit(data: any){
         }
         console.log(e.target.value);
     }
+    const [depositId, setDepositId] = useState(uuid4());
+    const codeStr = {
+        depositId: depositId,
+        amount: deposit.amount,
+        currency: deposit.currency,
+        country: deposit.country,
+        correspondent: deposit.correspondent,
+        recipient: {
+            type: "MSISDN",
+            address: {
+                value: deposit.msisdn
+            }
+        },
+        customerTimestamp: new Date().toISOString(),
+        statementDescription: deposit.description
+    }
+
 
     const onSubmit = async (e: any) => {
         e.preventDefault();
@@ -214,6 +233,7 @@ export default function Deposit(data: any){
                         </button>
                     </div>
                 </form>
+            <CodeRender message={JSON.stringify(codeStr, null, 2)} transactionType={'DEPOSIT'}/>
         </>
     )
 }

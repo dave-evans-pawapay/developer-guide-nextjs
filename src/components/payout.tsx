@@ -3,6 +3,8 @@
 import {useState} from "react";
 import Status from "@/components/status";
 import {useSearchParams} from "next/navigation";
+import uuid4 from "uuid4";
+import CodeRender from "@/components/code-render/code-render";
 
 export default function Payout(data: any){
     const searchParams = useSearchParams();
@@ -41,7 +43,22 @@ export default function Payout(data: any){
         minAmount: initialCorrespondent.operationTypes.find(o => o.operationType === 'PAYOUT')?.maxTransactionLimit,
         maxAmount: initialCorrespondent.operationTypes.find(o => o.operationType === 'PAYOUT')?.maxTransactionLimit
     });
-
+    const [payoutId, setPayoutId] = useState(uuid4());
+    const codeStr = {
+        payoutId: payoutId,
+        amount: payout.amount,
+        currency: payout.currency,
+        country: payout.country,
+        correspondent: payout.correspondent,
+        payer: {
+            type: "MSISDN",
+            address: {
+                value: payout.msisdn
+            }
+        },
+        customerTimestamp: new Date().toISOString(),
+        statementDescription: payout.description
+    }
     const handleCountryEvent = (e: any) => {
         const c = activeConfig.countries.find(data => data.country === (e.target.value));
         if (c) {
@@ -215,6 +232,7 @@ export default function Payout(data: any){
                         </button>
                     </div>
                 </form>
+            <CodeRender message={JSON.stringify(codeStr, null, 2)} transactionType={'PAYOUT'}/>
         </>
     )
 }
