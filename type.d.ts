@@ -66,6 +66,7 @@ type Message = {
 }
 
 type TestMsisdn = {
+    code: string,
     country: string,
     paymentType: string,
     mno: string,
