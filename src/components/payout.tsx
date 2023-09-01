@@ -1,6 +1,6 @@
 'use client'
 
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Status from "@/components/status";
 import {useSearchParams} from "next/navigation";
 import uuid4 from "uuid4";
@@ -16,7 +16,7 @@ export default function Payout(data: any){
             initialCountry = c;
         }
     }
-
+    const [payoutId, setPayoutId] = useState(uuid4());
     let initialCorrespondent = activeConfig.countries[0].correspondents[0];
     if (searchParams && searchParams.get('mno')){
         const c = initialCountry.correspondents.find(c => c.correspondent == searchParams.get('mno'));
@@ -31,9 +31,11 @@ export default function Payout(data: any){
     const [message, setMessage] = useState({
         message:'',
         status: 'Green',
+        id: payoutId,
+        paymentType: 'payout',
         show: false});
     const [payout, setPayout] = useState({
-        payoutId: "",
+        payoutId: payoutId,
         msisdn: msisdn,
         amount: "",
         currency: initialCorrespondent.currency,
@@ -43,22 +45,24 @@ export default function Payout(data: any){
         minAmount: initialCorrespondent.operationTypes.find(o => o.operationType === 'PAYOUT')?.maxTransactionLimit,
         maxAmount: initialCorrespondent.operationTypes.find(o => o.operationType === 'PAYOUT')?.maxTransactionLimit
     });
-    const [payoutId, setPayoutId] = useState(uuid4());
-    const codeStr = {
-        payoutId: payoutId,
-        amount: payout.amount,
-        currency: payout.currency,
-        country: payout.country,
-        correspondent: payout.correspondent,
-        payer: {
-            type: "MSISDN",
-            address: {
-                value: payout.msisdn
-            }
-        },
-        customerTimestamp: new Date().toISOString(),
-        statementDescription: payout.description
-    }
+
+        const codeStr = {
+            payoutId: payoutId,
+            amount: payout.amount,
+            currency: payout.currency,
+            country: payout.country,
+            correspondent: payout.correspondent,
+            payer: {
+                type: "MSISDN",
+                address: {
+                    value: payout.msisdn
+                }
+            },
+            customerTimestamp: new Date().toISOString(),
+            statementDescription: payout.description
+        }
+
+
     const handleCountryEvent = (e: any) => {
         const c = activeConfig.countries.find(data => data.country === (e.target.value));
         if (c) {
@@ -66,7 +70,7 @@ export default function Payout(data: any){
             payout.country = c.country;
             payout.correspondent = c.correspondents[0].correspondent;
             payout.currency = c.correspondents[0].currency;
-            payout.minAmount = c.correspondents[0].operationTypes.find(o => o.operationType === 'PAYOUT')?.maxTransactionLimit;
+            payout.minAmount = c.correspondents[0].operationTypes.find(o => o.operationType === 'PAYOUT')?.minTransactionLimit;
             payout.maxAmount = c.correspondents[0].operationTypes.find(o => o.operationType === 'PAYOUT')?.maxTransactionLimit;
 
         }
@@ -101,19 +105,19 @@ export default function Payout(data: any){
                         }
                     }).then(async res => {
                         if (res.status != 200) {
-                            setMessage( {...message, message: `Something went wrong: ${res.statusText}`, show:true});
+                            setMessage( {...message, message: `Something went wrong: ${res.statusText}`, id: payoutId, show:true});
                         } else {
                             const payoutResponse = await res.json();
                             console.log(JSON.stringify(payoutResponse));
                             if (payoutResponse.status === "COMPLETED") {
-                                setMessage( {...message, message: `Payout completed`, status: 'green', show:true});
+                                setMessage( {...message, message: `Payout completed`, status: 'green',id: payoutId, show:true});
                             } else {
-                                setMessage( {...message, message: `Payout failed: ${payoutResponse.message}`, status:'red', show:true});
+                                setMessage( {...message, message: `Payout failed: ${payoutResponse.message}`, id: payoutId, status:'red', show:true});
                             }
                         }
                     });
                 } else {
-                    setMessage( {...message, message: `Rejected: ${payoutResponse.rejectionReason.rejectionMessage}`, status:'red', show:true});
+                    setMessage( {...message, message: `Rejected: ${payoutResponse.rejectionReason.rejectionMessage}`, status:'red', id: payoutId, show:true});
                 }
             }
         })
@@ -122,7 +126,10 @@ export default function Payout(data: any){
 
     return (
         <>
-            { message.show ? <Status message={message.message} msgStatus={message.status}/> : null }
+            { message.show ? <Status message={message.message}
+                                     msgStatus={message.status}
+                                     id={message.id}
+                                     paymentType={message.paymentType}/> : null }
                 <form className="w-3/5  mt-5 mb-5"
                 onSubmit={onSubmit}>
                     <input type="hidden" id="currency" name="currency" value={payout.currency} />

@@ -68,6 +68,8 @@ type Address = {
 type Message = {
     message: string,
     status: string
+    id: string,
+    paymentType: string,
     show: boolean
 }
 

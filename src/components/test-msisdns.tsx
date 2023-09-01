@@ -26,17 +26,14 @@ export  default  function TestMsisdns(props: {}) {
         setCountry(country);
         let uniqueMnos = GetUniqueMno(country);
         setMno(uniqueMnos[0]);
-        if (typeof window !== 'undefined') {
-            sessionStorage.setItem('country', country)
-            sessionStorage.setItem('mno', uniqueMnos[0])
-        }
+        sessionStorage.setItem('country', country)
+        sessionStorage.setItem('mno', uniqueMnos[0])
         msisdns = GetMockMsisdn(country, uniqueMnos[0]);
     }
 
     const updateMno = (mno: any) => {
-        if (typeof window !== 'undefined') {
-            sessionStorage.setItem('mno', mno)
-        }
+        sessionStorage.setItem('mno', mno)
+
         setMno(mno);
         activeMsisdns = GetMockMsisdn(country, mno);
     }

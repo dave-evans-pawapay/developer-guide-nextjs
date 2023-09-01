@@ -1,6 +1,6 @@
 'use client'
 
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Status from "@/components/status";
 import {useSearchParams} from "next/navigation";
 import CodeRender from "@/components/code-render/code-render";
@@ -8,6 +8,7 @@ import uuid4 from "uuid4";
 
 export default function Deposit(data: any){
     const searchParams = useSearchParams();
+    const [depositId, setDepositId] = useState(uuid4());
     const activeConfig: ActiveConfig = data.data;
     let initialCountry = activeConfig.countries[0];
     if (searchParams && searchParams.get('country')){
@@ -31,9 +32,11 @@ export default function Deposit(data: any){
     const [message, setMessage] = useState({
         message:'',
         status: 'Green',
-        show: false});
+        paymentType: 'deposit',
+        show: false,
+        id: depositId});
     const [deposit, setDeposit] = useState({
-        depositId: "",
+        depositId: depositId,
         msisdn: msisdn,
         amount: "",
         currency: initialCorrespondent.currency,
@@ -56,22 +59,24 @@ export default function Deposit(data: any){
         }
         console.log(e.target.value);
     }
-    const [depositId, setDepositId] = useState(uuid4());
-    const codeStr = {
-        depositId: depositId,
-        amount: deposit.amount,
-        currency: deposit.currency,
-        country: deposit.country,
-        correspondent: deposit.correspondent,
-        recipient: {
-            type: "MSISDN",
-            address: {
-                value: deposit.msisdn
-            }
-        },
-        customerTimestamp: new Date().toISOString(),
-        statementDescription: deposit.description
-    }
+
+    let codeStr: any = {
+            depositId: depositId,
+            amount: deposit.amount,
+            currency: deposit.currency,
+            country: deposit.country,
+            correspondent: deposit.correspondent,
+            recipient: {
+                type: "MSISDN",
+                address: {
+                    value: deposit.msisdn
+                }
+            },
+            customerTimestamp: new Date().toISOString(),
+            statementDescription: deposit.description
+        }
+
+
 
 
     const onSubmit = async (e: any) => {
@@ -107,9 +112,9 @@ export default function Deposit(data: any){
                             const depositResponse = await res.json();
                             console.log(JSON.stringify(depositResponse));
                             if (depositResponse.status === "COMPLETED") {
-                                setMessage( {...message, message: `Deposit completed`, status: 'green', show:true});
+                                setMessage( {...message, message: `Deposit completed`, status: 'green', show:true,  });
                             } else {
-                                setMessage( {...message, message: `Deposit failed: ${depositResponse.message}`, status:'red', show:true});
+                                setMessage( {...message, message: `Deposit failed`, status:'red', show:true});
                             }
                         }
                     });
@@ -123,7 +128,10 @@ export default function Deposit(data: any){
 
     return (
         <>
-            { message.show ? <Status message={message.message} msgStatus={message.status}/> : null }
+            { message.show ? <Status message={message.message}
+                                     msgStatus={message.status}
+                                     paymentType={message.paymentType}
+                                     id={message.id} /> : null }
                 <form className="w-3/5  mt-5 mb-5"
                 onSubmit={onSubmit}>
                     <input type="hidden" id="currency" name="currency" value={deposit.currency} />

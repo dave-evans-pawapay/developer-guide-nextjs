@@ -2,6 +2,7 @@ import {NextApiRequest} from "next";
 import uuid4 from "uuid4";
 interface Payout extends NextApiRequest {
     body: {
+        payoutId: string,
         msisdn: string,
         amount: string,
         country: string,
@@ -16,7 +17,7 @@ export default async function depositHandler(req: Payout, res: any) {
         res.status(405).json({error: 'Method not allowed'});
         return;
     }
-    const {msisdn, amount, country, currency, correspondent, description} = req.body;
+    const {payoutId, msisdn, amount, country, currency, correspondent, description} = req.body;
 
     const address: Address = {
     value: msisdn
@@ -28,7 +29,7 @@ export default async function depositHandler(req: Payout, res: any) {
 
     // Lets submit the deposit request to the API
     const payoutRequest: PayoutRequest = {
-        payoutId: uuid4(),
+        payoutId: payoutId,
         amount: amount,
         currency: currency,
         statementDescription: description,
