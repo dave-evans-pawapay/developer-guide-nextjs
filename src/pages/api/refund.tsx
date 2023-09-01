@@ -2,6 +2,7 @@ import {NextApiRequest} from "next";
 import uuid4 from "uuid4";
 interface Refund extends NextApiRequest {
     body: {
+        refundId: string,
         depositId: string,
         amount: string
     }
@@ -12,11 +13,11 @@ export default async function refundHandler(req: Refund, res: any) {
         res.status(405).json({error: 'Method not allowed'});
         return;
     }
-    const {depositId, amount} = req.body;
+    const {refundId, depositId, amount} = req.body;
 
     // Lets submit the deposit request to the API
     const refundRequest: RefundRequest = {
-        refundId: uuid4(),
+        refundId: refundId,
         depositId: depositId,
         amount: amount
     }

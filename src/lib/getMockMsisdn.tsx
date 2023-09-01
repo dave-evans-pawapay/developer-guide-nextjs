@@ -1,4 +1,6 @@
 'use client'
+import {useEffect} from "react";
+
 let msisdn: TestMsisdn[] = [
     {code: 'BEN', country: 'Benin',mno: 'MTN_MOMO_BEN',paymentType: 'DEPOSIT',msisdn:'22912345012',failureReason: 'PAYER_LIMIT_REACHED'},
     {code: 'BEN', country: 'Benin',mno: 'MTN_MOMO_BEN',paymentType: 'DEPOSIT',msisdn:'22912345022',failureReason: 'PAYER_NOT_FOUND'},
@@ -265,7 +267,7 @@ let msisdn: TestMsisdn[] = [
 export default function(country?: string | null,mno? : string | null ) {
     let output = msisdn;
     let output2: TestMsisdn[] = [];
-    if (typeof window !== 'undefined') {
+    useEffect(() => {
         if (country || sessionStorage.getItem('country')) {
             if (!country){
                 output = output.filter(c => c.country === sessionStorage.getItem('country'));
@@ -280,14 +282,8 @@ export default function(country?: string | null,mno? : string | null ) {
                 output2 = output.filter(c => c.mno === mno);
             }
         }
-    } else {
-        if (country) {
-                output = output.filter(c => c.country === country);
-        }
-        if (mno) {
-                output2 = output.filter(c => c.mno === mno);
-            }
-    }
+    })
+
     return output2.length > 0 ? output2 : output
 }
 
