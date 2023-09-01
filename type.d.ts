@@ -50,6 +50,12 @@ type  PayoutRequest = {
     statementDescription: string
 }
 
+type RefundRequest = {
+    refundId: string,
+    depositId: string,
+    amount: string
+}
+
 type Recipient = {
     type: string,
     address: Address
