@@ -1,6 +1,6 @@
 'use client'
 import GetMockMsisdn, {GetUniqueCountries, GetUniqueMno} from "@/lib/getMockMsisdn";
-import {useEffect, useLayoutEffect, useState} from "react";
+import {useState} from "react";
 import Link from "next/link";
 
 export  default  function TestMsisdns(props: {}) {
@@ -24,15 +24,19 @@ export  default  function TestMsisdns(props: {}) {
 
     const updateCountry = (country: any) => {
         setCountry(country);
-        sessionStorage.setItem('country', country)
         let uniqueMnos = GetUniqueMno(country);
         setMno(uniqueMnos[0]);
-        sessionStorage.setItem('mno', uniqueMnos[0])
+        if (typeof window !== 'undefined') {
+            sessionStorage.setItem('country', country)
+            sessionStorage.setItem('mno', uniqueMnos[0])
+        }
         msisdns = GetMockMsisdn(country, uniqueMnos[0]);
     }
 
     const updateMno = (mno: any) => {
-        sessionStorage.setItem('mno', mno)
+        if (typeof window !== 'undefined') {
+            sessionStorage.setItem('mno', mno)
+        }
         setMno(mno);
         activeMsisdns = GetMockMsisdn(country, mno);
     }
