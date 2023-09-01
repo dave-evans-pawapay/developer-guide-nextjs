@@ -1,5 +1,4 @@
 import {Metadata} from "next";
-import GetMockMsisdn from "@/lib/getMockMsisdn";
 import TestMsisdns from "@/components/test-msisdns";
 
 export const metadata: Metadata = {
@@ -7,12 +6,9 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-    let msisdns = await GetMockMsisdn();
-    const uniqueCountries = msisdns.map((item: TestMsisdn) => item.country)
-            .filter((value: any, index: number, self: any) => self.indexOf(value) === index);
   return (
       <>
-        <div className="text-2xl font-bold">Test numbers for each country / mno </div>
+        <div className="text-2xl mt-2 mb-2 font-bold text-gray-800">Test numbers for each country / mno </div>
         <TestMsisdns></TestMsisdns>
       </>
   )

@@ -1,47 +1,51 @@
 'use client'
-import GetMockMsisdn from "@/lib/getMockMsisdn";
-import {useState} from "react";
+import GetMockMsisdn, {GetUniqueCountries, GetUniqueMno} from "@/lib/getMockMsisdn";
+import {useEffect, useLayoutEffect, useState} from "react";
 import Link from "next/link";
 
-export  default function TestMsisdns(props: {}) {
+export  default  function TestMsisdns(props: {}) {
     let msisdns =  GetMockMsisdn();
-    const uniqueCountries = msisdns.map((item: TestMsisdn) => item.country)
-        .filter((value: any, index: number, self: any) => self.indexOf(value) === index);
     const [country, setCountry] =
         useState<string>(msisdns[0].country);
     const [mno, setMno] =
         useState<string>(msisdns[0].mno);
+    const uniqueCountries = GetUniqueCountries();
 
-    let uniqueMnos = msisdns.filter(c => c.country === country).map((item: TestMsisdn) => item.mno)
-        .filter((value: any, index: number, self: any) => self.indexOf(value) === index);
+    let uniqueMnos = GetUniqueMno(country);
+    let activeMsisdns = GetMockMsisdn(country, mno);
 
-    let activeMsisdns = msisdns.filter((item: TestMsisdn) => item.country === country && item.mno === mno);
     const handleCountryEvent = (e: any) => {
-        const c = msisdns.filter(data => data.country === (e.target.value));
-        if (c) {
-            setCountry(e.target.value);
-            setMno(c[0].mno);
-            let uniqueMnos = msisdns.filter(c => c.country === country).map((item: TestMsisdn) => item.country)
-                .filter((value: any, index: number, self: any) => self.indexOf(value) === index);
-            let activeMsisdns = msisdns.filter((item: TestMsisdn) => item.country === country && item.mno === mno);
-        }
-        console.log(e.target.value);
+       updateCountry(e.target.value);
     }
     const handleMnoEvent = (e: any) => {
-        const c = msisdns.filter(data => data.mno === (e.target.value));
-        if (c) {
-            setMno(e.target.value);
-            let activeMsisdns = msisdns.filter((item: TestMsisdn) => item.country === country && item.mno === mno);
-        }
-        console.log(e.target.value);
+        updateMno(e.target.value);
+    }
+
+
+    const updateCountry = (country: any) => {
+        setCountry(country);
+        sessionStorage.setItem('country', country)
+        let uniqueMnos = GetUniqueMno(country);
+        setMno(uniqueMnos[0]);
+        sessionStorage.setItem('mno', uniqueMnos[0])
+        msisdns = GetMockMsisdn(country, uniqueMnos[0]);
+    }
+
+    const updateMno = (mno: any) => {
+        sessionStorage.setItem('mno', mno)
+        setMno(mno);
+        activeMsisdns = GetMockMsisdn(country, mno);
     }
 
     return (
         <>
-            <div className="flex flex-row gap-5">
+            <div className="flex flex-row gap-5 mt-2 mb-2">
                 <div>
                     <select name="country" id="country"
-                            onChange={e => handleCountryEvent(e)}>
+                            defaultValue={country}
+                            onChange={e => handleCountryEvent(e)}
+                            className="appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                    >
                         {uniqueCountries.map(country => (
                             <option key={country} value={country}>{country}</option>
                         ))}
@@ -49,9 +53,12 @@ export  default function TestMsisdns(props: {}) {
                 </div>
                 <div>
                     <select name="mno" id="mno"
-                            onChange={e => handleMnoEvent(e)}>
-                        {uniqueMnos.map(mno => (
-                            <option key={mno} value={mno}>{mno}</option>
+                            defaultValue={mno}
+                            onChange={e => handleMnoEvent(e)}
+                            className="appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                    >
+                        {uniqueMnos.map(m => (
+                            <option key={m} value={m}>{m}</option>
                         ))}
                     </select>
                 </div>
