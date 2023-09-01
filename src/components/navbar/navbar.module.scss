@@ -6,3 +6,9 @@
 .active {
   color: rgb(147 51 234);
 }
+
+@media (prefers-color-scheme: dark) {
+  .nonActive {
+    color: white;
+  }
+}
