@@ -267,28 +267,11 @@ let msisdn: TestMsisdn[] = [
 export default function(country?: string | null,mno? : string | null ) {
     let output = msisdn;
     let output2: TestMsisdn[] = [];
-    if (typeof window !== 'undefined') {
-        if (country || sessionStorage.getItem('country')) {
-            if (!country){
-                output = output.filter(c => c.country === sessionStorage.getItem('country'));
-            } else {
+    if (country){
                 output = output.filter(c => c.country === country);
-            }
-        }
-        if (mno || sessionStorage.getItem('mno')) {
-            if (!mno){
-                output2 = output.filter(c => c.mno === sessionStorage.getItem('mno'));
-            } else {
+    }
+    if (mno) {
                 output2 = output.filter(c => c.mno === mno);
-            }
-        }
-    } else {
-        if (country) {
-                output = output.filter(c => c.country === country);
-        }
-        if (mno) {
-                output2 = output.filter(c => c.mno === mno);
-            }
     }
     return output2.length > 0 ? output2 : output
 }

@@ -2,14 +2,14 @@ import './globals.scss'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import NavBar from "@/components/navbar/navbar";
-
+import {MsisdnContextProvider} from "@/context/mno.context";
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'pawaPay nextjs sandbox - Home'
 }
 
-export default function RootLayout({
+export  default function RootLayout({
   children,
 }: {
   children: React.ReactNode
@@ -34,8 +34,12 @@ export default function RootLayout({
           </div>
         </div>
       </nav>
-        {children}
+        <MsisdnContextProvider>
+          {children}
+        </MsisdnContextProvider>
       </body>
     </html>
   )
 }
+
+
