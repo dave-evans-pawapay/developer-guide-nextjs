@@ -1,20 +1,29 @@
 'use client'
 
-import {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import Status from "@/components/status";
 import {useSearchParams} from "next/navigation";
 import CodeRender from "@/components/code-render/code-render";
 import uuid4 from "uuid4";
+import {MsisdnContext} from "@/context/mno.context";
+import dynamic from "next/dynamic";
+import WebPhone from "@/components/web-phone/web-phone";
+import {subscribe} from "diagnostics_channel";
 
 export default function Deposit(data: any){
     const searchParams = useSearchParams();
+    const { state, dispatch } = useContext(MsisdnContext);
     const [depositId, setDepositId] = useState(uuid4());
+
+    const [phoneAlert, setPhoneAlert] = useState('');
+    const [receipt, setReceipt] = useState('');
+
     const activeConfig: ActiveConfig = data.data;
     let initialCountry = activeConfig.countries[0];
     if (searchParams && searchParams.get('country')){
         const c = activeConfig.countries.find(c => c.country == searchParams.get('country'));
         if (c) {
-            initialCountry = c;
+            dispatch({ type: 'UPDATE_COUNTRY', payload: c.country});
         }
     }
 
@@ -22,7 +31,7 @@ export default function Deposit(data: any){
     if (searchParams && searchParams.get('mno')){
         const c = initialCountry.correspondents.find(c => c.correspondent == searchParams.get('mno'));
         if (c) {
-            initialCorrespondent = c;
+            dispatch({ type: 'UPDATE_MNO', payload: c.correspondent});
         }
     }
     const [country, setCountry] = useState<Country>(initialCountry);
@@ -50,7 +59,7 @@ export default function Deposit(data: any){
     const handleCountryEvent = (e: any) => {
         const c = activeConfig.countries.find(data => data.country === (e.target.value));
         if (c) {
-            setCountry(c);
+            //setCountry(c);
             deposit.country = c.country;
             deposit.correspondent = c.correspondents[0].correspondent;
             deposit.currency = c.correspondents[0].currency;
@@ -77,10 +86,17 @@ export default function Deposit(data: any){
         }
 
 
+    useEffect(() => {
+        document.addEventListener('pinComplete', () => {
+            setPhoneAlert('')
+            setReceipt('Transaction Complete');
+        });
+    });
 
 
     const onSubmit = async (e: any) => {
         e.preventDefault();
+        //setPhoneAlert('Please enter your PIN on the phone');
         if (!deposit.msisdn || !deposit.amount || !deposit.currency || !deposit.country || !deposit.correspondent) {
             alert("Please fill all the fields");
             return;
@@ -96,6 +112,7 @@ export default function Deposit(data: any){
             if (res.status != 200) {
                 setMessage( {...message, message: `Something went wrong: ${res.statusText}`, show:true});
             } else {
+                //setPhoneAlert('Please enter your PIN on the phone');
                 const depositResponse = await res.json();
                 deposit.depositId = depositResponse.depositId;
                 if (depositResponse.status === "ACCEPTED") {
@@ -132,8 +149,10 @@ export default function Deposit(data: any){
                                      msgStatus={message.status}
                                      paymentType={message.paymentType}
                                      id={message.id} /> : null }
-                <form className="w-3/5  mt-5 mb-5"
-                onSubmit={onSubmit}>
+            <div className="md:flex flex-row gap-5" >
+                <div>
+                    <form className="w-5/5  mt-5 mb-5"
+                                           onSubmit={onSubmit}>
                     <input type="hidden" id="currency" name="currency" value={deposit.currency} />
                     <div className="md:flex md:items-center mb-6">
                         <div className="md:w-1/3">
@@ -142,12 +161,12 @@ export default function Deposit(data: any){
                             </label>
                         </div>
                         <div className="md:w-2/3">
-                        <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-400 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                               id="msisdn" name="msisdn" type="text" placeholder="MSISDN"
-                               defaultValue={msisdn ? msisdn : ''}
-                               onChange={(e) => {
-                                   setDeposit({ ...deposit, msisdn: e.target.value });
-                               }}/>
+                            <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-400 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                                   id="msisdn" name="msisdn" type="text" placeholder="MSISDN"
+                                   defaultValue={msisdn ? msisdn : ''}
+                                   onChange={(e) => {
+                                       setDeposit({ ...deposit, msisdn: e.target.value });
+                                   }}/>
                         </div>
                     </div>
                     <div className="md:flex md:items-center mb-6">
@@ -158,10 +177,10 @@ export default function Deposit(data: any){
                         </div>
                         <div>
                             <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-400 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-                               id="amount" name="amount" type="text" placeholder="Amount"
-                               onChange={(e) => {
-                                   setDeposit({ ...deposit, amount: e.target.value });
-                               }}/>
+                                   id="amount" name="amount" type="text" placeholder="Amount"
+                                   onChange={(e) => {
+                                       setDeposit({ ...deposit, amount: e.target.value });
+                                   }}/>
                         </div>
                         <div className="block ml-2 text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
                             {deposit.currency}
@@ -170,7 +189,7 @@ export default function Deposit(data: any){
                     </div>
                     <div className="md:flex md:justify-end mb-6">
                         <div className="block ml-2 text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
-                           Min: {deposit.minAmount} | Max: {deposit.maxAmount}
+                            Min: {deposit.minAmount} | Max: {deposit.maxAmount}
                         </div>
                     </div>
                     <div className="md:flex md:items-center mb-6">
@@ -178,19 +197,19 @@ export default function Deposit(data: any){
                             <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" >
                                 Country
                             </label>
-                         </div>
+                        </div>
 
-                         <div className="inline-block relative w-64">
+                        <div className="inline-block relative w-64">
                             <select className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                     id="country"
                                     name="country"
                                     onChange={e => handleCountryEvent(e)}
-                                value={country.country}>
+                                    value={country.country}>
                                 { activeConfig.countries.map((c: any) => {
-                                return (
-                                    <option key={c.country} value={c.country}>{c.country}</option>
-                                )
-                            })}
+                                    return (
+                                        <option key={c.country} value={c.country}>{c.country}</option>
+                                    )
+                                })}
                             </select>
                         </div>
                     </div>
@@ -210,8 +229,8 @@ export default function Deposit(data: any){
                                     }}>
 
                                 { correspondents && correspondents.map((config: any) => {
-                                return (
-                                    <option key={config.correspondent} value={config.correspondent}>{config.correspondent}</option>
+                                    return (
+                                        <option key={config.correspondent} value={config.correspondent}>{config.correspondent}</option>
                                     )
                                 })}
                             </select>
@@ -228,7 +247,8 @@ export default function Deposit(data: any){
                                    id="description"
                                    name="description"
                                    type="text"
-                                   placeholder="Description"
+                                   maxLength = {22}
+                                  placeholder="Description"
                                    onChange={(e) => {
                                        setDeposit({ ...deposit, description: e.target.value });
                                    }}/>
@@ -241,7 +261,12 @@ export default function Deposit(data: any){
                         </button>
                     </div>
                 </form>
-            <CodeRender message={JSON.stringify(codeStr, null, 2)} transactionType={'DEPOSIT'}/>
+                </div>
+                <div><WebPhone phoneAlert={phoneAlert} receipt={receipt}></WebPhone></div>
+            </div>
+            <div>
+                <CodeRender message={JSON.stringify(codeStr, null, 2)} transactionType={'DEPOSIT'}/>
+            </div>
         </>
     )
 }

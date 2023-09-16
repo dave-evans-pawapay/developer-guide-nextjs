@@ -1,18 +1,29 @@
 'use client'
 import GetMockMsisdn, {GetUniqueCountries, GetUniqueMno} from "@/lib/getMockMsisdn";
-import {useState} from "react";
+import {createContext, Dispatch, useContext, useState} from "react";
 import Link from "next/link";
+import {MsisdnContext} from "@/context/mno.context";
 
-export  default  function TestMsisdns(props: {}) {
+export  default  function TestMsisdns() {
     let msisdns =  GetMockMsisdn();
-    const [country, setCountry] =
-        useState<string>(msisdns[0].country);
-    const [mno, setMno] =
-        useState<string>(msisdns[0].mno);
+    const { state, dispatch } = useContext(MsisdnContext);
+    const updateCountry = (country: any) => {
+        dispatch({ type: 'UPDATE_COUNTRY', payload: country});
+        let uniqueMnos = GetUniqueMno(country);
+        dispatch({ type: 'UPDATE_MNO', payload: uniqueMnos[0]});
+        msisdns = GetMockMsisdn(country, uniqueMnos[0]);
+    }
     const uniqueCountries = GetUniqueCountries();
 
-    let uniqueMnos = GetUniqueMno(country);
-    let activeMsisdns = GetMockMsisdn(country, mno);
+    let uniqueMnos = GetUniqueMno(state.country);
+    
+    if (state.country === '') {
+        updateCountry(msisdns[0].country);
+    }
+    if (state.mno === '') {
+        dispatch({ type: 'UPDATE_MNO', payload: GetUniqueMno(state.country)[0]});
+    }
+    let activeMsisdns = GetMockMsisdn(state.country, state.mno);
 
     const handleCountryEvent = (e: any) => {
        updateCountry(e.target.value);
@@ -22,20 +33,12 @@ export  default  function TestMsisdns(props: {}) {
     }
 
 
-    const updateCountry = (country: any) => {
-        setCountry(country);
-        let uniqueMnos = GetUniqueMno(country);
-        setMno(uniqueMnos[0]);
-        sessionStorage.setItem('country', country)
-        sessionStorage.setItem('mno', uniqueMnos[0])
-        msisdns = GetMockMsisdn(country, uniqueMnos[0]);
-    }
+
 
     const updateMno = (mno: any) => {
         sessionStorage.setItem('mno', mno)
-
-        setMno(mno);
-        activeMsisdns = GetMockMsisdn(country, mno);
+        dispatch({ type: 'UPDATE_MNO', payload: mno});
+        activeMsisdns = GetMockMsisdn(state.country, mno);
     }
 
     return (
@@ -43,7 +46,7 @@ export  default  function TestMsisdns(props: {}) {
             <div className="flex flex-row gap-5 mt-2 mb-2">
                 <div>
                     <select name="country" id="country"
-                            defaultValue={country}
+                            defaultValue={state.country}
                             onChange={e => handleCountryEvent(e)}
                             className="appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     >
@@ -54,7 +57,7 @@ export  default  function TestMsisdns(props: {}) {
                 </div>
                 <div>
                     <select name="mno" id="mno"
-                            defaultValue={mno}
+                            defaultValue={state.mno}
                             onChange={e => handleMnoEvent(e)}
                             className="appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     >
@@ -103,6 +106,6 @@ export  default  function TestMsisdns(props: {}) {
                                 </tbody>
                             </table>
             </div>
-        </>
+       </>
     )
 }

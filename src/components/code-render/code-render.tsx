@@ -1,3 +1,4 @@
+'use client'
 import {JSXElementConstructor, PromiseLikeOfReactNode, ReactElement, ReactNode, ReactPortal, useState} from "react";
 
 export default function CodeRender(props: { message: string, transactionType: string }){
