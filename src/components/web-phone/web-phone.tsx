@@ -1,24 +1,35 @@
 import {useEffect, useState} from "react";
 import uuid4 from "uuid4";
-
+import { DateTime } from "luxon";
 export default function WebPhone(props: { phoneAlert: string, receipt: string }){
 
 
     const event = new Event('pinComplete');
     const [phoneAlert, setPhoneAlert]=useState(props.phoneAlert);
-    const receipt = props.receipt;
+    const [receipt, setReceipt] = useState( props.receipt);
     const [keyboardOpen, setKeyboardOpen] = useState('');
     const [ counter, setCounter]= useState(0)
     const [pin,setPin] =
         useState(['_','_','_','_']);
 
+    const [dateTime, setDateTime] = useState(DateTime.local());
+
+    window.setInterval(() => {
+        setDateTime(DateTime.local());
+    },1000);
+
     useEffect(() => {
-        if (phoneAlert.length > 0) {
-            setKeyboardOpen('keyboard.open');
+        setPhoneAlert(props.phoneAlert);
+        if (props.phoneAlert.length > 0) {
+            setKeyboardOpen('keyboard_open');
         } else {
-            setKeyboardOpen('');
+            setKeyboardOpen('keyboard_close');
         }
-    }, [phoneAlert]);
+    }, [props.phoneAlert]);
+
+    useEffect(() => {
+        setReceipt(props.receipt);
+    }, [props.receipt]);
     const numberClick = async (e: any) => {
         const o = Object.assign([], pin);
         // @ts-ignore
@@ -32,6 +43,7 @@ export default function WebPhone(props: { phoneAlert: string, receipt: string })
     };
     return (
         <>
+            <div className="mt-5">
         <div className="marvel-device s5 white">
             <div className="top-bar"></div>
             <div className="sleep"></div>
@@ -41,8 +53,8 @@ export default function WebPhone(props: { phoneAlert: string, receipt: string })
             <div className="screen">
                 <div className="content">
                     <div className="mobile-clock">
-                        <div className="time"></div>
-                        <div className="date"></div>
+                        <div className="time">{dateTime.toLocaleString(DateTime.TIME_SIMPLE)}</div>
+                        <div className="date">{dateTime.toLocaleString(DateTime.DATE_SHORT)}</div>
                     </div>
                     {phoneAlert.length > 0 &&  <div className="alert">
                         <div className="alert-string">
@@ -147,6 +159,7 @@ export default function WebPhone(props: { phoneAlert: string, receipt: string })
         </div></div>
         <div className="home"></div>
     </div>
+            </div>
         </>
     )
 }
