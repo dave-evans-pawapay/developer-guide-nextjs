@@ -1,41 +1,39 @@
 'use client'
 
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, Dispatch, useEffect, useState} from "react";
 import Status from "@/components/status";
 import {useSearchParams} from "next/navigation";
 import CodeRender from "@/components/code-render/code-render";
 import uuid4 from "uuid4";
-import {MsisdnContext} from "@/context/mno.context";
 import dynamic from "next/dynamic";
 import WebPhone from "@/components/web-phone/web-phone";
-import {subscribe} from "diagnostics_channel";
-
+import {MsisdnContext} from "@/context/mno.context";
 export default function Deposit(data: any){
     const searchParams = useSearchParams();
-    const { state, dispatch } = useContext(MsisdnContext);
     const [depositId, setDepositId] = useState(uuid4());
-
+    const { state, dispatch } = useContext(MsisdnContext);
     const [phoneAlert, setPhoneAlert] = useState('');
     const [receipt, setReceipt] = useState('');
-
+    const [receivedPin, setReceivedPin] = useState(false);
+    const [readyToProceed, setReadyToProceed] = useState(false);
     const activeConfig: ActiveConfig = data.data;
     let initialCountry = activeConfig.countries[0];
     if (searchParams && searchParams.get('country')){
         const c = activeConfig.countries.find(c => c.country == searchParams.get('country'));
         if (c) {
-            dispatch({ type: 'UPDATE_COUNTRY', payload: c.country});
+            initialCountry = c;
         }
     }
-
     let initialCorrespondent = activeConfig.countries[0].correspondents[0];
     if (searchParams && searchParams.get('mno')){
         const c = initialCountry.correspondents.find(c => c.correspondent == searchParams.get('mno'));
         if (c) {
-            dispatch({ type: 'UPDATE_MNO', payload: c.correspondent});
+            initialCorrespondent = c;
         }
     }
     const [country, setCountry] = useState<Country>(initialCountry);
     const [correspondent, setCorrespondent] = useState<string>(initialCorrespondent.correspondent);
+
     const correspondents = country.correspondents;
     const msisdn = searchParams?.get("msisdn") ? searchParams.get("msisdn") : "";
     const [message, setMessage] = useState({
@@ -59,15 +57,33 @@ export default function Deposit(data: any){
     const handleCountryEvent = (e: any) => {
         const c = activeConfig.countries.find(data => data.country === (e.target.value));
         if (c) {
-            //setCountry(c);
+            setCountry(c);
+            dispatch({ type: 'UPDATE_COUNTRY', payload: c.country});
             deposit.country = c.country;
             deposit.correspondent = c.correspondents[0].correspondent;
+            dispatch({ type: 'UPDATE_MNO', payload: deposit.correspondent});
             deposit.currency = c.correspondents[0].currency;
             deposit.minAmount = c.correspondents[0].operationTypes.find(o => o.operationType === 'DEPOSIT')?.minTransactionLimit;
             deposit.maxAmount = c.correspondents[0].operationTypes.find(o => o.operationType === 'DEPOSIT')?.maxTransactionLimit;
         }
         console.log(e.target.value);
+
     }
+
+    const handleMnoEvent = (e: any) => {
+        const c = country.correspondents.find(data => data.correspondent === (e.target.value));
+        if (c?.correspondent) {
+            setCorrespondent(c.correspondent);
+            dispatch({ type: 'UPDATE_MNO', payload: c.correspondent});
+            deposit.correspondent = c.correspondent;
+            deposit.currency = c.currency;
+            deposit.minAmount = c.operationTypes.find(o => o.operationType === 'DEPOSIT')?.minTransactionLimit;
+            deposit.maxAmount = c.operationTypes.find(o => o.operationType === 'DEPOSIT')?.maxTransactionLimit;
+        }
+        console.log(e.target.value);
+
+    }
+
 
     let codeStr: any = {
             depositId: depositId,
@@ -88,20 +104,57 @@ export default function Deposit(data: any){
 
     useEffect(() => {
         document.addEventListener('pinComplete', () => {
-            setPhoneAlert('')
-            setReceipt('Transaction Complete');
+            setPhoneAlert('');
+            setReceivedPin(true);
         });
     });
 
 
+    useEffect(() => {
+        dispatch({ type: 'UPDATE_MNO', payload: correspondent});
+    }, [deposit]);
+
+    useEffect(() => {
+        if (receivedPin && readyToProceed){
+            getStatus();
+        }
+    },[receivedPin]);
+    useEffect(() => {
+        if (receivedPin && readyToProceed){
+            getStatus();
+        }
+    },[readyToProceed]);
+
+
+    const getStatus = async() =>{
+        await fetch(`/api/deposit-check?depositId=${deposit.depositId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                }
+        }).then(async res => {
+                if (res.status != 200) {
+                    setMessage( {...message, message: `Something went wrong: ${res.statusText}`, show:true});
+                } else {
+                    const depositResponse = await res.json();
+                    console.log(JSON.stringify(depositResponse));
+                    if (depositResponse.status === "COMPLETED") {
+                        setMessage( {...message, message: `Deposit completed`, status: 'green', show:true,  });
+                    } else {
+                        setMessage( {...message, message: `Deposit failed`, status:'red', show:true});
+                    }
+                }
+            });
+        }
+
+
     const onSubmit = async (e: any) => {
         e.preventDefault();
-        //setPhoneAlert('Please enter your PIN on the phone');
+
         if (!deposit.msisdn || !deposit.amount || !deposit.currency || !deposit.country || !deposit.correspondent) {
             alert("Please fill all the fields");
             return;
         }
-
         await fetch("/api/deposit", {
             method: "POST",
             headers: {
@@ -109,33 +162,18 @@ export default function Deposit(data: any){
             },
             body: JSON.stringify(deposit),
         }).then(async res => {
+
             if (res.status != 200) {
                 setMessage( {...message, message: `Something went wrong: ${res.statusText}`, show:true});
             } else {
-                //setPhoneAlert('Please enter your PIN on the phone');
+                setPhoneAlert('Please enter your PIN on the phone');
                 const depositResponse = await res.json();
                 deposit.depositId = depositResponse.depositId;
                 if (depositResponse.status === "ACCEPTED") {
-                    setMessage( {...message, message: `Accepted, checking status`, status:'yellow', show:true});
-                    await fetch(`/api/deposit-check?depositId=${deposit.depositId}`, {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                        }
-                    }).then(async res => {
-                        if (res.status != 200) {
-                            setMessage( {...message, message: `Something went wrong: ${res.statusText}`, show:true});
-                        } else {
-                            const depositResponse = await res.json();
-                            console.log(JSON.stringify(depositResponse));
-                            if (depositResponse.status === "COMPLETED") {
-                                setMessage( {...message, message: `Deposit completed`, status: 'green', show:true,  });
-                            } else {
-                                setMessage( {...message, message: `Deposit failed`, status:'red', show:true});
-                            }
-                        }
-                    });
+                    setMessage({...message, message: `Accepted, checking status`, status: 'yellow', show: true});
+                    setReadyToProceed(true)
                 } else {
+                    setPhoneAlert('');
                     setMessage( {...message, message: `Rejected: ${depositResponse.rejectionReason.rejectionMessage}`, status:'red', show:true});
                 }
             }
@@ -224,9 +262,8 @@ export default function Deposit(data: any){
                             <select className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                     id="correspondent"
                                     name="correspondent"
-                                    onChange={(e) => {
-                                        setDeposit({ ...deposit, correspondent: e.target.value });
-                                    }}>
+                                    value={correspondent}
+                                    onChange={e => handleMnoEvent(e)}>
 
                                 { correspondents && correspondents.map((config: any) => {
                                     return (

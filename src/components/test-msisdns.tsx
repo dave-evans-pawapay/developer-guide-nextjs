@@ -33,8 +33,6 @@ export  default  function TestMsisdns() {
     }
 
 
-
-
     const updateMno = (mno: any) => {
         sessionStorage.setItem('mno', mno)
         dispatch({ type: 'UPDATE_MNO', payload: mno});
