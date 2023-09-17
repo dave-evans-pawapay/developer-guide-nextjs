@@ -1,17 +1,20 @@
 'use client'
 
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import Status from "@/components/status";
 import {useSearchParams} from "next/navigation";
 import uuid4 from "uuid4";
 import CodeRender from "@/components/code-render/code-render";
+import {getCountryFromCode} from "@/lib/getMockMsisdn";
+import {MsisdnContext} from "@/context/mno.context";
 
 export default function Payout(data: any){
     const searchParams = useSearchParams();
     const activeConfig: ActiveConfig = data.data;
+    const { state, dispatch } = useContext(MsisdnContext);
     let initialCountry = activeConfig.countries[0];
-    if (searchParams && searchParams.get('country')){
-        const c = activeConfig.countries.find(c => c.country == searchParams.get('country'));
+    if (searchParams && searchParams.get('code')){
+        const c = activeConfig.countries.find(c => c.country == searchParams.get('code'));
         if (c) {
             initialCountry = c;
         }
@@ -67,14 +70,33 @@ export default function Payout(data: any){
         const c = activeConfig.countries.find(data => data.country === (e.target.value));
         if (c) {
             setCountry(c);
+            const currentCountry = getCountryFromCode(c.country);
+            if (currentCountry) {
+                dispatch({type: 'UPDATE_COUNTRY', payload: currentCountry});
+            }
             payout.country = c.country;
             payout.correspondent = c.correspondents[0].correspondent;
+            dispatch({ type: 'UPDATE_MNO', payload: payout.correspondent});
             payout.currency = c.correspondents[0].currency;
             payout.minAmount = c.correspondents[0].operationTypes.find(o => o.operationType === 'PAYOUT')?.minTransactionLimit;
             payout.maxAmount = c.correspondents[0].operationTypes.find(o => o.operationType === 'PAYOUT')?.maxTransactionLimit;
 
         }
         console.log(e.target.value);
+    }
+
+    const handleMnoEvent = (e: any) => {
+        const c = country.correspondents.find(data => data.correspondent === (e.target.value));
+        if (c?.correspondent) {
+            setCorrespondent(c.correspondent);
+            dispatch({ type: 'UPDATE_MNO', payload: c.correspondent});
+            payout.correspondent = c.correspondent;
+            payout.currency = c.currency;
+            payout.minAmount = c.operationTypes.find(o => o.operationType === 'PAYOUT')?.minTransactionLimit;
+            payout.maxAmount = c.operationTypes.find(o => o.operationType === 'PAYOUT')?.maxTransactionLimit;
+        }
+        console.log(e.target.value);
+
     }
 
     const onSubmit = async (e: any) => {
@@ -203,9 +225,7 @@ export default function Payout(data: any){
                             <select className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                     id="correspondent"
                                     name="correspondent"
-                                    onChange={(e) => {
-                                        setPayout({ ...payout, correspondent: e.target.value });
-                                    }}>
+                                    onChange={e => handleMnoEvent(e)}>
 
                                 { correspondents && correspondents.map((config: any) => {
                                 return (
