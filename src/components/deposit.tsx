@@ -8,6 +8,7 @@ import uuid4 from "uuid4";
 import dynamic from "next/dynamic";
 import WebPhone from "@/components/web-phone/web-phone";
 import {MsisdnContext} from "@/context/mno.context";
+import {getCountryFromCode} from "@/lib/getMockMsisdn";
 export default function Deposit(data: any){
     const searchParams = useSearchParams();
     const [depositId, setDepositId] = useState(uuid4());
@@ -18,8 +19,8 @@ export default function Deposit(data: any){
     const [readyToProceed, setReadyToProceed] = useState(false);
     const activeConfig: ActiveConfig = data.data;
     let initialCountry = activeConfig.countries[0];
-    if (searchParams && searchParams.get('country')){
-        const c = activeConfig.countries.find(c => c.country == searchParams.get('country'));
+    if (searchParams && searchParams.get('code')){
+        const c = activeConfig.countries.find(c => c.country == searchParams.get('code'));
         if (c) {
             initialCountry = c;
         }
@@ -58,7 +59,10 @@ export default function Deposit(data: any){
         const c = activeConfig.countries.find(data => data.country === (e.target.value));
         if (c) {
             setCountry(c);
-            dispatch({ type: 'UPDATE_COUNTRY', payload: c.country});
+            const currentCountry = getCountryFromCode(c.country);
+            if (currentCountry) {
+                dispatch({type: 'UPDATE_COUNTRY', payload: currentCountry});
+            }
             deposit.country = c.country;
             deposit.correspondent = c.correspondents[0].correspondent;
             dispatch({ type: 'UPDATE_MNO', payload: deposit.correspondent});

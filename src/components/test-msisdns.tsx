@@ -1,29 +1,26 @@
 'use client'
 import GetMockMsisdn, {GetUniqueCountries, GetUniqueMno} from "@/lib/getMockMsisdn";
-import {createContext, Dispatch, useContext, useState} from "react";
+import {createContext, Dispatch, useContext, useEffect, useState} from "react";
 import Link from "next/link";
 import {MsisdnContext} from "@/context/mno.context";
 
 export  default  function TestMsisdns() {
     let msisdns =  GetMockMsisdn();
+    const uniqueCountries = GetUniqueCountries();
     const { state, dispatch } = useContext(MsisdnContext);
+    const [country, setCountry] = useState(state.country ? state.country : uniqueCountries[0]);
+    let uniqueMnos: any[] = GetUniqueMno(country);
+    const [mno, setMno] = useState(state.mno ? state.mno : uniqueMnos[0]);
+
     const updateCountry = (country: any) => {
-        dispatch({ type: 'UPDATE_COUNTRY', payload: country});
-        let uniqueMnos = GetUniqueMno(country);
+        uniqueMnos = GetUniqueMno(country);
+        setCountry(country);
+        dispatch({type: 'UPDATE_COUNTRY', payload: country});
         dispatch({ type: 'UPDATE_MNO', payload: uniqueMnos[0]});
+        setMno(uniqueMnos[0]);
         msisdns = GetMockMsisdn(country, uniqueMnos[0]);
     }
-    const uniqueCountries = GetUniqueCountries();
-
-    let uniqueMnos = GetUniqueMno(state.country);
-    
-    if (state.country === '') {
-        updateCountry(msisdns[0].country);
-    }
-    if (state.mno === '') {
-        dispatch({ type: 'UPDATE_MNO', payload: GetUniqueMno(state.country)[0]});
-    }
-    let activeMsisdns = GetMockMsisdn(state.country, state.mno);
+    let activeMsisdns = GetMockMsisdn(country, mno);
 
     const handleCountryEvent = (e: any) => {
        updateCountry(e.target.value);
@@ -34,9 +31,9 @@ export  default  function TestMsisdns() {
 
 
     const updateMno = (mno: any) => {
-        sessionStorage.setItem('mno', mno)
         dispatch({ type: 'UPDATE_MNO', payload: mno});
         activeMsisdns = GetMockMsisdn(state.country, mno);
+        setMno(mno);
     }
 
     return (
@@ -44,7 +41,7 @@ export  default  function TestMsisdns() {
             <div className="flex flex-row gap-5 mt-2 mb-2">
                 <div>
                     <select name="country" id="country"
-                            defaultValue={state.country}
+                            defaultValue={country}
                             onChange={e => handleCountryEvent(e)}
                             className="appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     >
@@ -55,7 +52,7 @@ export  default  function TestMsisdns() {
                 </div>
                 <div>
                     <select name="mno" id="mno"
-                            defaultValue={state.mno}
+                            defaultValue={mno}
                             onChange={e => handleMnoEvent(e)}
                             className="appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     >
@@ -87,7 +84,7 @@ export  default  function TestMsisdns() {
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             <div className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
                                                 <Link
-                                                    href={`/${msisdn.paymentType.toLowerCase() === 'deposit' ? '/' : 'payout'}?country=${msisdn.code}&mno=${msisdn.mno}&msisdn=${msisdn.msisdn}`}>
+                                                    href={`/${msisdn.paymentType.toLowerCase() === 'deposit' ? '/' : 'payout'}?code=${msisdn.code}&mno=${msisdn.mno}&msisdn=${msisdn.msisdn}`}>
                                                     { msisdn.paymentType}
                                                 </Link>
                                             </div>
