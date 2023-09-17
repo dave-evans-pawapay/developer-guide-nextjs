@@ -7,6 +7,7 @@ import uuid4 from "uuid4";
 import CodeRender from "@/components/code-render/code-render";
 import {getCountryFromCode} from "@/lib/getMockMsisdn";
 import {MsisdnContext} from "@/context/mno.context";
+import {ActiveConfig, Country} from "../../type";
 
 export default function Payout(data: any){
     const searchParams = useSearchParams();

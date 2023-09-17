@@ -4,6 +4,7 @@ import {useState} from "react";
 import Status from "@/components/status";
 import uuid4 from "uuid4";
 import CodeRender from "@/components/code-render/code-render";
+import {ActiveConfig} from "../../type";
 
 export default function Refund(data: any){
 
