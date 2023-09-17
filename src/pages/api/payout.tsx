@@ -1,5 +1,8 @@
 import {NextApiRequest} from "next";
 import uuid4 from "uuid4";
+import {Address, PayoutRequest, Recipient} from "../../../type";
+import {authOptions} from "@/pages/api/auth/[...nextauth]";
+import { getServerSession } from "next-auth/next"
 interface Payout extends NextApiRequest {
     body: {
         payoutId: string,
@@ -13,6 +16,13 @@ interface Payout extends NextApiRequest {
 }
 
 export default async function depositHandler(req: Payout, res: any) {
+    const session = await getServerSession(req,res,authOptions)
+    let url = `${process.env.SANDBOX_API_URL}/payouts`
+    let apiKey = process.env.SANDBOX_API_KEY
+    if (session?.user?.email) {
+        url = `${process.env.PROD_API_URL}/payouts`
+        apiKey = process.env.PROD_API_KEY
+    }
     if (req.method !== 'POST') {
         res.status(405).json({error: 'Method not allowed'});
         return;
@@ -39,11 +49,11 @@ export default async function depositHandler(req: Payout, res: any) {
         customerTimestamp: new Date().toISOString()
     }
 
-    const response = await fetch(`${process.env.API_URL}/payouts`, {
+    const response = await fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + process.env.API_KEY,
+            'Authorization': 'Bearer ' + apiKey,
         },
         body: JSON.stringify(payoutRequest)
     });

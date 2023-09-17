@@ -1,6 +1,14 @@
-
+import {authOptions} from "@/pages/api/auth/[...nextauth]";
+import { getServerSession } from "next-auth/next"
 
 export default async function depositCheckHandler(req: any, res: any) {
+    const session = await getServerSession(req,res,authOptions)
+    let url = `${process.env.SANDBOX_API_URL}/deposits`
+    let apiKey = process.env.SANDBOX_API_KEY
+    if (session?.user?.email) {
+        url = `${process.env.PROD_API_URL}/deposits`
+        apiKey = process.env.PROD_API_KEY
+    }
     if (req.method !== 'GET') {
         res.status(405).json({error: 'Method not allowed'});
         return;
@@ -14,11 +22,11 @@ export default async function depositCheckHandler(req: any, res: any) {
     }
     for ( let i=0; i<backoff.length; i++) {
         await sleep(backoff[i]);
-        const response = await fetch(`${process.env.API_URL}/deposits/${depositId}`, {
+        const response = await fetch(`${url}/${depositId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + process.env.API_KEY,
+                'Authorization': 'Bearer ' + apiKey,
             }
         });
         const depositResponse = await response.json();

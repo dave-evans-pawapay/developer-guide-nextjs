@@ -84,7 +84,7 @@ export  default  function TestMsisdns() {
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             <div className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
                                                 <Link
-                                                    href={`/${msisdn.paymentType.toLowerCase() === 'deposit' ? '/' : 'payout'}?code=${msisdn.code}&mno=${msisdn.mno}&msisdn=${msisdn.msisdn}`}>
+                                                    href={`/protected/${msisdn.paymentType.toLowerCase() === 'deposit' ? 'deposit' : 'payout'}?code=${msisdn.code}&mno=${msisdn.mno}&msisdn=${msisdn.msisdn}`}>
                                                     { msisdn.paymentType}
                                                 </Link>
                                             </div>

@@ -9,7 +9,12 @@ import dynamic from "next/dynamic";
 import WebPhone from "@/components/web-phone/web-phone";
 import {MsisdnContext} from "@/context/mno.context";
 import {getCountryFromCode} from "@/lib/getMockMsisdn";
+import {ActiveConfig, Country} from "../../type";
+import { useSession } from "next-auth/react"
+
+
 export default function Deposit(data: any){
+    const { data: session } = useSession()
     const searchParams = useSearchParams();
     const [depositId, setDepositId] = useState(uuid4());
     const { state, dispatch } = useContext(MsisdnContext);
@@ -75,17 +80,16 @@ export default function Deposit(data: any){
     }
 
     const handleMnoEvent = (e: any) => {
-        const c = country.correspondents.find(data => data.correspondent === (e.target.value));
+        const c = country.correspondents.find((data: { correspondent: any; }) => data.correspondent === (e.target.value));
         if (c?.correspondent) {
             setCorrespondent(c.correspondent);
             dispatch({ type: 'UPDATE_MNO', payload: c.correspondent});
             deposit.correspondent = c.correspondent;
             deposit.currency = c.currency;
-            deposit.minAmount = c.operationTypes.find(o => o.operationType === 'DEPOSIT')?.minTransactionLimit;
-            deposit.maxAmount = c.operationTypes.find(o => o.operationType === 'DEPOSIT')?.maxTransactionLimit;
+            deposit.minAmount = c.operationTypes.find((o: { operationType: string; }) => o.operationType === 'DEPOSIT')?.minTransactionLimit;
+            deposit.maxAmount = c.operationTypes.find((o: { operationType: string; }) => o.operationType === 'DEPOSIT')?.maxTransactionLimit;
         }
         console.log(e.target.value);
-
     }
 
 
@@ -187,6 +191,9 @@ export default function Deposit(data: any){
 
     return (
         <>
+            <div>
+                User Email: {session?.user.email}
+            </div>
             { message.show ? <Status message={message.message}
                                      msgStatus={message.status}
                                      paymentType={message.paymentType}

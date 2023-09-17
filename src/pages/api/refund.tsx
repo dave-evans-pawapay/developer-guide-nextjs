@@ -1,5 +1,8 @@
 import {NextApiRequest} from "next";
 import uuid4 from "uuid4";
+import {RefundRequest} from "../../../type";
+import {authOptions} from "@/pages/api/auth/[...nextauth]";
+import { getServerSession } from "next-auth/next"
 interface Refund extends NextApiRequest {
     body: {
         refundId: string,
@@ -9,6 +12,13 @@ interface Refund extends NextApiRequest {
 }
 
 export default async function refundHandler(req: Refund, res: any) {
+    const session = await getServerSession(req,res,authOptions)
+    let url = `${process.env.SANDBOX_API_URL}/refunds`
+    let apiKey = process.env.SANDBOX_API_KEY
+    if (session?.user?.email) {
+        url = `${process.env.PROD_API_URL}/refunds`
+        apiKey = process.env.PROD_API_KEY
+    }
     if (req.method !== 'POST') {
         res.status(405).json({error: 'Method not allowed'});
         return;
@@ -22,11 +32,11 @@ export default async function refundHandler(req: Refund, res: any) {
         amount: amount
     }
 
-    const response = await fetch(`${process.env.API_URL}/refunds`, {
+    const response = await fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + process.env.API_KEY,
+            'Authorization': 'Bearer ' + apiKey,
         },
         body: JSON.stringify(refundRequest)
     });
