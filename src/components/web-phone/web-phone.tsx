@@ -1,3 +1,4 @@
+'use client'
 import {useEffect, useState} from "react";
 import uuid4 from "uuid4";
 import { DateTime } from "luxon";
