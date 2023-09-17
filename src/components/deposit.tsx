@@ -148,6 +148,7 @@ export default function Deposit(data: any){
                     console.log(JSON.stringify(depositResponse));
                     if (depositResponse.status === "COMPLETED") {
                         setMessage( {...message, message: `Deposit completed`, status: 'green', show:true,  });
+                        setReceipt('Transaction completed successfully');
                     } else {
                         setMessage( {...message, message: `Deposit failed`, status:'red', show:true});
                     }

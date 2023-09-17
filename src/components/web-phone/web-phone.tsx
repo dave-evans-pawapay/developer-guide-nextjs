@@ -41,6 +41,10 @@ export default function WebPhone(props: { phoneAlert: string, receipt: string })
             document.dispatchEvent(event);
         }
     };
+
+    const clearReceipt = async () => {
+       setReceipt('');
+    };
     return (
         <>
             <div className="mt-5">
@@ -83,7 +87,8 @@ export default function WebPhone(props: { phoneAlert: string, receipt: string })
                             </div>
                         </div>
                     </div>}
-                    {receipt.length > 0 && <div className="alert" >
+                    {receipt.length > 0 && <div className="alert"
+                                                onClick={() => clearReceipt()}>
                         receipt
                 </div>}
         </div>
