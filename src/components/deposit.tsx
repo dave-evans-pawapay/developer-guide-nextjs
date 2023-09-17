@@ -211,7 +211,7 @@ export default function Deposit(data: any){
                             </label>
                         </div>
                         <div className="md:w-2/3">
-                            <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-400 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                            <input className="appearance-none block w-full bg-gray-200 text-gray-700  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                                    id="msisdn" name="msisdn" type="text" placeholder="MSISDN"
                                    defaultValue={msisdn ? msisdn : ''}
                                    onChange={(e) => {
@@ -225,14 +225,14 @@ export default function Deposit(data: any){
                                 Amount
                             </label>
                         </div>
-                        <div>
-                            <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-400 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                        <div className="md:w-2/3">
+                            <input className="appearance-none block w-full bg-gray-200 text-gray-700  rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                                    id="amount" name="amount" type="text" placeholder="Amount"
                                    onChange={(e) => {
                                        setDeposit({ ...deposit, amount: e.target.value });
                                    }}/>
                         </div>
-                        <div className="block ml-2 text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
+                        <div className="block ml-2 text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4 currency">
                             {deposit.currency}
                         </div>
 
@@ -249,7 +249,7 @@ export default function Deposit(data: any){
                             </label>
                         </div>
 
-                        <div className="inline-block relative w-64">
+                        <div className="md:w-2/3">
                             <select className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                     id="country"
                                     name="country"
@@ -270,7 +270,7 @@ export default function Deposit(data: any){
                             </label>
                         </div>
 
-                        <div className="inline-block relative w-64">
+                        <div className="md:w-2/3">
                             <select className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                     id="correspondent"
                                     name="correspondent"
@@ -292,7 +292,7 @@ export default function Deposit(data: any){
                             </label>
                         </div>
                         <div className="md:w-2/3">
-                            <input className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-400 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                            <input className="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                                    id="description"
                                    name="description"
                                    type="text"
