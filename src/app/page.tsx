@@ -16,7 +16,6 @@ export default async function Home() {
             <div className="flex flex-col content-center flex-wrap">
                 <Deposit data = {activeConfig}></Deposit>
             </div>
-            <phone-widget phone="123" alert="test"></phone-widget>
         </main>
       </>
   )
