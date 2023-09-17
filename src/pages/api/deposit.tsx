@@ -1,5 +1,8 @@
 import {NextApiRequest} from "next";
 import uuid4 from "uuid4";
+import {Address, DepositRequest, Payer} from "../../../type";
+import {authOptions} from "@/pages/api/auth/[...nextauth]";
+import { getServerSession } from "next-auth/next"
 interface Deposit extends NextApiRequest {
     body: {
         depositId: string,
@@ -13,6 +16,16 @@ interface Deposit extends NextApiRequest {
 }
 
 export default async function depositHandler(req: Deposit, res: any) {
+    const session = await getServerSession(req,res,authOptions)
+    let url = `${process.env.SANDBOX_API_URL}/deposits`
+    let apiKey = process.env.SANDBOX_API_KEY
+    if (session?.user?.email) {
+        url = `${process.env.PROD_API_URL}/deposits`
+        apiKey = process.env.PROD_API_KEY
+    }
+
+
+
     if (req.method !== 'POST') {
         res.status(405).json({error: 'Method not allowed'});
         return;
@@ -20,7 +33,7 @@ export default async function depositHandler(req: Deposit, res: any) {
     const {depositId, msisdn, amount, country, currency, correspondent, description} = req.body;
 
     const address: Address = {
-    value: msisdn
+        value: msisdn
     }
     const payer : Payer = {
         type:"MSISDN",
@@ -39,11 +52,11 @@ export default async function depositHandler(req: Deposit, res: any) {
         customerTimestamp: new Date().toISOString()
     }
 
-    const response = await fetch(`${process.env.API_URL}/deposits`, {
+    const response = await fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + process.env.API_KEY,
+            'Authorization': 'Bearer ' + apiKey,
         },
         body: JSON.stringify(depositRequest)
     });

@@ -81,3 +81,9 @@ type TestMsisdn = {
     msisdn: string
     failureReason: string
 }
+
+export type User = {
+    name: string;
+    email: string;
+    image: string;
+};

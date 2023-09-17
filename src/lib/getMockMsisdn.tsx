@@ -1,5 +1,6 @@
 'use client'
 import {useEffect} from "react";
+import { TestMsisdn } from "../../type";
 
 let msisdn: TestMsisdn[] = [
     {code: 'BEN', country: 'Benin',mno: 'MTN_MOMO_BEN',paymentType: 'DEPOSIT',msisdn:'22912345012',failureReason: 'PAYER_LIMIT_REACHED'},
