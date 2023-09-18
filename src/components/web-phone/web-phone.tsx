@@ -21,7 +21,7 @@ export default function WebPhone(props: { phoneAlert: string, receipt: string })
 
     useEffect(() => {
         setPhoneAlert(props.phoneAlert);
-        if (props.phoneAlert.length > 0) {
+        if (props.phoneAlert && props.phoneAlert.length > 0) {
             setKeyboardOpen('keyboard_open');
         } else {
             setKeyboardOpen('keyboard_close');
@@ -90,7 +90,7 @@ export default function WebPhone(props: { phoneAlert: string, receipt: string })
                     </div>}
                     {receipt.length > 0 && <div className="alert"
                                                 onClick={() => clearReceipt()}>
-                        receipt
+                        {receipt}
                 </div>}
         </div>
         <div className={'keyboard ' + keyboardOpen} >

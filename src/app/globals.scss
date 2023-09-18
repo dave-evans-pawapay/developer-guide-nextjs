@@ -87,11 +87,13 @@ h1 {
   align-items: center;
   border-radius: 20px;
   justify-content: center;
-  background-color:rgba(255,255,255,0.5);
+  background-color:rgba(255,255,255,0.9);
   color:black;
   min-height:100px;
   width:90%;
-  margin-top:-20px;
+  margin-top:-100px;
+  padding: 20px;
+  z-index:100
 }
 
 .mobile-clock {
