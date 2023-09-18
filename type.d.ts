@@ -1,3 +1,5 @@
+import {DateTime} from "luxon";
+
 type ActiveConfig = {
     merchantId: string,
     merchantName: string,
@@ -87,3 +89,26 @@ export type User = {
     email: string;
     image: string;
 };
+
+export type PhoneMessage = {
+    mno: string;
+    country: string;
+    amount: number;
+    company: string;
+    currency: string;
+}
+
+export type PhoneAlert = {
+    mno: string,
+    country: string,
+    amount: number,
+    company: string,
+    currency: string,
+    marketingMsg: string,
+    msisdn: string,
+    transId?: string,
+    transDate?: string,
+    transTime?: string,
+    balance: number,
+    transAmount?: number,
+}

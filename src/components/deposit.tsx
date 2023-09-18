@@ -11,6 +11,7 @@ import {MsisdnContext} from "@/context/mno.context";
 import {getCountryFromCode} from "@/lib/getMockMsisdn";
 import {ActiveConfig, Country} from "../../type";
 import { useSession } from "next-auth/react"
+import {PhoneAlert, PhoneMesage} from "@/lib/phone-message";
 
 
 export default function Deposit(data: any){
@@ -148,7 +149,18 @@ export default function Deposit(data: any){
                     console.log(JSON.stringify(depositResponse));
                     if (depositResponse.status === "COMPLETED") {
                         setMessage( {...message, message: `Deposit completed`, status: 'green', show:true,  });
-                        setReceipt('Transaction completed successfully');
+                        let pAlert: any = {
+                            mno: deposit.correspondent,
+                            country: deposit.country,
+                            amount: deposit.amount,
+                            company: 'CYN PAWAPAY K LTD',
+                            currency: deposit.currency,
+                            marketingMsg: `Apply for LIPA na ${deposit.correspondent} loan today and get 10% off your first loan.  Dial *483*1# to apply.`,
+                            msisdn: deposit.msisdn,
+                            balance: 299999,
+                        } ;
+                        pAlert = Object.assign(new PhoneAlert(), pAlert);
+                        setReceipt(pAlert.getMessage());
                     } else {
                         setMessage( {...message, message: `Deposit failed`, status:'red', show:true});
                     }
@@ -159,7 +171,14 @@ export default function Deposit(data: any){
 
     const onSubmit = async (e: any) => {
         e.preventDefault();
-
+        let pAlert: PhoneMesage = {
+            mno: deposit.correspondent,
+            country: deposit.country,
+            amount: parseFloat(deposit.amount),
+            company: 'CYN PAWAPAY K LTD',
+            currency: deposit.currency
+        } as PhoneMesage;
+        pAlert = Object.assign(new PhoneMesage(), pAlert);
         if (!deposit.msisdn || !deposit.amount || !deposit.currency || !deposit.country || !deposit.correspondent) {
             alert("Please fill all the fields");
             return;
@@ -175,7 +194,7 @@ export default function Deposit(data: any){
             if (res.status != 200) {
                 setMessage( {...message, message: `Something went wrong: ${res.statusText}`, show:true});
             } else {
-                setPhoneAlert('Please enter your PIN on the phone');
+                setPhoneAlert(pAlert.getMessage());
                 const depositResponse = await res.json();
                 deposit.depositId = depositResponse.depositId;
                 if (depositResponse.status === "ACCEPTED") {
