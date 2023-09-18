@@ -153,7 +153,7 @@ export default function Deposit(data: any){
                             mno: deposit.correspondent,
                             country: deposit.country,
                             amount: deposit.amount,
-                            company: 'CYN PAWAPAY K LTD',
+                            company: activeConfig.merchantName,
                             currency: deposit.currency,
                             marketingMsg: `Apply for LIPA na ${deposit.correspondent} loan today and get 10% off your first loan.  Dial *483*1# to apply.`,
                             msisdn: deposit.msisdn,
@@ -175,7 +175,7 @@ export default function Deposit(data: any){
             mno: deposit.correspondent,
             country: deposit.country,
             amount: parseFloat(deposit.amount),
-            company: 'CYN PAWAPAY K LTD',
+            company: activeConfig.merchantName,
             currency: deposit.currency
         } as PhoneMesage;
         pAlert = Object.assign(new PhoneMesage(), pAlert);
