@@ -17,19 +17,20 @@ const NavBar = () => {
                     Home
                 </Link>
             </li>
-        <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
-            <Link href='/protected/deposit' className={pathname === '/protected/deposit' ? styles.active : styles.nonActive}>
-                Deposit
-            </Link>
-        </li>
-        <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
-            <Link
-                href='/protected/payout'
-                className={pathname === '/protected/payout' ? styles.active : styles.nonActive}
+            <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
+                <Link href='/protected/deposit'
+                      className={pathname === '/protected/deposit' ? styles.active : styles.nonActive}>
+                    Deposit
+                </Link>
+            </li>
+            <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
+                <Link
+                    href='/protected/payout'
+                    className={pathname === '/protected/payout' ? styles.active : styles.nonActive}
                 >
-                Payout
-            </Link>
-        </li>
+                    Payout
+                </Link>
+            </li>
             <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
                 <Link
                     href='/protected/refund'
@@ -54,6 +55,14 @@ const NavBar = () => {
                     MSISDN
                 </Link>
             </li>
+            <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
+                <Link
+                    href='/protected/generate-test-transactions'
+                    className={pathname === '/protected/generate-test-transactions' ? styles.active : styles.nonActive}
+                >
+                    Test Transactions
+                </Link>
+            </li>
             {session?.user.email != null && <li>
                 <Link
                     href='/api/auth/signout'
@@ -74,7 +83,7 @@ const NavBar = () => {
 
         </ul>
 
-);
+    );
 };
 
 export default NavBar;
