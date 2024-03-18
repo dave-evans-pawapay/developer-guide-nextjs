@@ -84,11 +84,23 @@ export default function GenerateTestTransactions(data: any){
 
     const onSubmit = async (e: any) => {
         e.preventDefault();
-        if (!testTransaction.country || !testTransaction.correspondent || !testTransaction.quantity || !testTransaction.errorRatio || !testTransaction.transactionType) {
-            alert("Please fill all the fields");
+        if (!testTransaction.country || !testTransaction.correspondent || !testTransaction.description || !testTransaction.quantity || !testTransaction.errorRatio || !testTransaction.transactionType) {
+            setMessage({...message, status: 'red',
+                message: `Please fill in all fields`, show: true});
             return;
         }
 
+        if (testTransaction.description && testTransaction.description.length < 22 && testTransaction.description.length < 3) {
+            setMessage({...message, status: 'red',
+                message: `Description should be greater greater than 3 characters and less than 23`, show: true});
+            return;
+        }
+        const pattern = new RegExp(/^[a-zA-Z0-9 ]+$/);
+        if (!pattern.test(testTransaction.description.toString())) {
+            setMessage({...message, status: 'red',
+                message: `Description should alphanumeric only`, show: true});
+            return;
+        }
         await fetch("/api/generate-test-transactions", {
             method: "POST",
             headers: {
@@ -97,13 +109,13 @@ export default function GenerateTestTransactions(data: any){
             body: JSON.stringify(testTransaction),
         }).then(async res => {
             if (res.status != 200) {
-                setMessage({...message, message: `Something went wrong: ${res.statusText}`, show: true});
+                setMessage({...message, status: 'red', message: `Something went wrong: ${res.statusText}`, show: true});
             } else {
                 const data = await res.json();
-                setMessage({...message, message: `Test transactions generated successfully`, show: true, id: data.id});
+                setMessage({...message, status: 'green', message: `Test transactions generated successfully`, show: true, id: data.id});
             }
         }).catch(e => {
-            setMessage({...message, message: `Something went wrong: ${e}`, show: true});
+            setMessage({...message, status: 'red', message: `Something went wrong: ${e}`, show: true});
         });
     }
 
@@ -176,7 +188,7 @@ export default function GenerateTestTransactions(data: any){
                                 maxLength={22}
                                 placeholder="Description"
                                 onChange={(e) => {
-
+                                    setTestTransaction({...testTransaction, description: e.target.value});
                                 }}/>
                         </div>
                     </div>
