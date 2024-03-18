@@ -84,15 +84,14 @@ export default async function testTransactionsHandler(req: TestTransaction, res:
         if (errorRatio == 0) {
             outputMsIsdn = Array(quantity).fill(msisdnSuccess)
         } else {
-            for (let i = 0; i < quantity; i++) {
-                if (Math.random() * 100 < errorRatio) {
-                    // Error
-                    const errorItem = Math.round(Math.random() * msisdnError.length);
-                    outputMsIsdn.push(msisdnError[errorItem]);
-                } else {
-                    // Success
-                    outputMsIsdn.push(msisdnSuccess)
-                }
+            const errorInstances = Math.round(quantity * (errorRatio / 100))
+            const successInstances = quantity - errorInstances
+            for (let i = 0; i < errorInstances; i++) {
+                const errorItem = Math.round(Math.random() * msisdnError.length);
+                outputMsIsdn.push(msisdnError[errorItem]);
+            }
+            for (let i = 0; i < successInstances; i++) {
+                outputMsIsdn.push(msisdnSuccess)
             }
         }
         for (let tx of outputMsIsdn) {
