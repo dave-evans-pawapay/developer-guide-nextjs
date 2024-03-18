@@ -84,7 +84,7 @@ export default function GenerateTestTransactions(data: any){
 
     const onSubmit = async (e: any) => {
         e.preventDefault();
-        if (!testTransaction.country || !testTransaction.correspondent || !testTransaction.description || !testTransaction.quantity || !testTransaction.errorRatio || !testTransaction.transactionType) {
+        if (!testTransaction.country || !testTransaction.correspondent || !testTransaction.description || !testTransaction.quantity || !testTransaction.transactionType) {
             setMessage({...message, status: 'red',
                 message: `Please fill in all fields`, show: true});
             return;
@@ -94,6 +94,9 @@ export default function GenerateTestTransactions(data: any){
             setMessage({...message, status: 'red',
                 message: `Description should be greater greater than 3 characters and less than 23`, show: true});
             return;
+        }
+        if (!testTransaction.errorRatio) {
+            setTestTransaction({...testTransaction, errorRatio: 0});
         }
         const pattern = new RegExp(/^[a-zA-Z0-9 ]+$/);
         if (!pattern.test(testTransaction.description.toString())) {

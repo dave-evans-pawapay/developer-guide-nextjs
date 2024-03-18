@@ -81,15 +81,18 @@ export default async function testTransactionsHandler(req: TestTransaction, res:
          // grab success msisdn
         const msisdnSuccess = msisdn.find((m) => m.failureReason === 'SUCCESS')
         const msisdnError = msisdn.filter((m) => m.failureReason != 'SUCCESS')
-
-        for (let i = 0; i < quantity; i++) {
-            if (Math.random() * 100 < errorRatio) {
-                // Error
-                const errorItem = Math.round(Math.random() * msisdnError.length);
-                outputMsIsdn.push(msisdnError[errorItem]);
-            } else {
-                // Success
-                outputMsIsdn.push(msisdnSuccess)
+        if (errorRatio == 0) {
+            outputMsIsdn = Array(quantity).fill(msisdnSuccess)
+        } else {
+            for (let i = 0; i < quantity; i++) {
+                if (Math.random() * 100 < errorRatio) {
+                    // Error
+                    const errorItem = Math.round(Math.random() * msisdnError.length);
+                    outputMsIsdn.push(msisdnError[errorItem]);
+                } else {
+                    // Success
+                    outputMsIsdn.push(msisdnSuccess)
+                }
             }
         }
         for (let tx of outputMsIsdn) {
