@@ -254,7 +254,6 @@ export default function Deposit(data: any){
                         <div className="block ml-2 text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4 currency">
                             {deposit.currency}
                         </div>
-
                     </div>
                     <div className="md:flex md:justify-end mb-6">
                         <div className="block ml-2 text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">

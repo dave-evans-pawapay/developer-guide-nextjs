@@ -6,6 +6,16 @@ type ActiveConfig = {
     countries: Country[]
 }
 
+type testTransaction = {
+    country: string,
+    currency: string,
+    correspondent: string,
+    description: string,
+    quantity: number,
+    errorRatio: number,
+    type: string
+}
+
 type Country = {
     country: string,
     correspondents: Correspondent[]
