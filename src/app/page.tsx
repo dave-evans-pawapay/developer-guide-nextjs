@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 export default async function Home() {
     const activeConfig =  await getActiveConfig();
     const session = await getServerSession(authOptions)
+
   return (
       <>
           <Platform></Platform>

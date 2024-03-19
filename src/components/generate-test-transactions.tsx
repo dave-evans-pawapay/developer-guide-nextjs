@@ -13,8 +13,16 @@ import {PhoneAlert, PhoneMesage} from "@/lib/phone-message";
 
 
 export default function GenerateTestTransactions(data: any){
-    const { data: session } = useSession()
     const searchParams = useSearchParams();
+    const { data: session } = useSession()
+    if (session?.user?.email) {
+        return (
+            <div>
+                <h1>Protected route</h1>
+                <p>This route is unavailable in production mode</p>
+            </div>
+        )
+    }
     const { state, dispatch } = useContext(MsisdnContext);
     const activeConfig: ActiveConfig = data.data;
     let initialCountry = activeConfig.countries[0];

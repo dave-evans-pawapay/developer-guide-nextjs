@@ -16,7 +16,14 @@ export default async function RootLayout ({ children }: {
   children: React.ReactNode
 }){
   const session = await getServerSession(authOptions)
-
+    if (session && session.user.email && session.user.email.indexOf('@pawapay') <= 0) {
+        return (
+            <div className="flex flex-col content-center flex-wrap text-gray-800">
+                <h1>Unauthorized</h1>
+                <p>You are not authorized to access this page</p>
+            </div>
+        )
+    }
   return (
       <html lang="en">
       <body className={inter.className}>

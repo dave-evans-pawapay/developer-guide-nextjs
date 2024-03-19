@@ -8,9 +8,19 @@ import CodeRender from "@/components/code-render/code-render";
 import {getCountryFromCode} from "@/lib/getMockMsisdn";
 import {MsisdnContext} from "@/context/mno.context";
 import {ActiveConfig, Country} from "../../type";
+import {useSession} from "next-auth/react";
 
 export default function Payout(data: any){
     const searchParams = useSearchParams();
+    const { data: session } = useSession()
+    if (session?.user?.email) {
+        return (
+            <div>
+                <h1>Protected route</h1>
+                <p>This route is unavailable in production mode</p>
+            </div>
+        )
+    }
     const activeConfig: ActiveConfig = data.data;
     const { state, dispatch } = useContext(MsisdnContext);
     let initialCountry = activeConfig.countries[0];

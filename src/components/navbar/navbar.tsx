@@ -23,7 +23,8 @@ const NavBar = () => {
                     Deposit
                 </Link>
             </li>
-            <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
+            {session?.user.email == null &&
+                <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
                 <Link
                     href='/protected/payout'
                     className={pathname === '/protected/payout' ? styles.active : styles.nonActive}
@@ -31,7 +32,9 @@ const NavBar = () => {
                     Payout
                 </Link>
             </li>
-            <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
+            }
+            {session?.user.email == null &&
+                <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
                 <Link
                     href='/protected/refund'
                     className={pathname === '/protected/refund' ? styles.active : styles.nonActive}
@@ -39,7 +42,8 @@ const NavBar = () => {
                     Refund
                 </Link>
             </li>
-            <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
+            }
+            {session?.user.email == null && <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
                 <Link
                     href='/bulk'
                     className={pathname === '/bulk' ? styles.active : styles.nonActive}
@@ -47,6 +51,7 @@ const NavBar = () => {
                     Bulk
                 </Link>
             </li>
+            }
             <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
                 <Link
                     href='/msisdn'
@@ -55,7 +60,7 @@ const NavBar = () => {
                     MSISDN
                 </Link>
             </li>
-            <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
+            {session?.user.email == null &&  <li className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500">
                 <Link
                     href='/protected/generate-test-transactions'
                     className={pathname === '/protected/generate-test-transactions' ? styles.active : styles.nonActive}
@@ -63,6 +68,7 @@ const NavBar = () => {
                     Test Transactions
                 </Link>
             </li>
+            }
             {session?.user.email != null && <li>
                 <Link
                     href='/api/auth/signout'
