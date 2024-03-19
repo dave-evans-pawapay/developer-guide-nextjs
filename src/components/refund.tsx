@@ -5,12 +5,21 @@ import Status from "@/components/status";
 import uuid4 from "uuid4";
 import CodeRender from "@/components/code-render/code-render";
 import {ActiveConfig} from "../../type";
+import {useSession} from "next-auth/react";
 
 export default function Refund(data: any){
 
     const activeConfig: ActiveConfig = data.data;
     const [refundId, setPayoutId] = useState(uuid4());
-
+    const { data: session } = useSession()
+    if (session?.user?.email) {
+        return (
+            <div>
+                <h1>Protected route</h1>
+                <p>This route is unavailable in production mode</p>
+            </div>
+        )
+    }
     const [message, setMessage] = useState({
         message:'',
         status: 'Green',
