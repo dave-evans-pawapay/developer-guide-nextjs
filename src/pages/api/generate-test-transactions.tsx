@@ -28,7 +28,7 @@ export default async function testTransactionsHandler(req: TestTransaction, res:
         if (session?.user?.email) {
             return res.status(405).json({message: 'Can not generate test transactions on production'});
         }
-
+        console.log('req.method', req.method);
         if (req.method !== 'POST') {
             res.status(405).json({error: 'Method not allowed'});
             return;
