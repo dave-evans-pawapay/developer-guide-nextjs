@@ -44,7 +44,11 @@ export default async function testAllTransactionsHandler(req: TestTransaction, r
         }
         const activeConfig = await activeConfigRes.json()
         console.log('activeConfigRes', JSON.stringify(activeConfig))
-        for (let country of activeConfig.countries) {
+        let countryList = activeConfig.countries
+        if (country) {
+            countryList = activeConfig.countries.filter((c: any) => c.country == country)
+        }
+        for (let country of countryList) {
             for (let correspondent of country.correspondents) {
                 for (let operationType of correspondent.operationTypes) {
                     let minAmount = +operationType.minTransactionLimit
